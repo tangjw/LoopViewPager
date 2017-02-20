@@ -11,15 +11,10 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.RequestManager;
-import com.loopj.android.http.TextHttpResponseHandler;
 import com.tjw.loopviewpager.R;
-import com.tjw.loopviewpager.bean.Banner;
 import com.tjw.loopviewpager.widget.indicator.CirclePagerIndicator;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import cz.msebera.android.httpclient.Header;
 
 
 /**
@@ -30,34 +25,24 @@ import cz.msebera.android.httpclient.Header;
 public abstract class HeaderView extends RelativeLayout implements ViewPager.OnPageChangeListener, Runnable {
     protected ViewPager mViewPager;
     protected CirclePagerIndicator mIndicator;
-    protected List<Banner> mBanners;
     protected BannerAdapter mAdapter;
     protected Handler mHandler;
     protected int mCurrentItem;
     protected RequestManager mImageLoader;
-    protected TextHttpResponseHandler mCallBack;
-    protected String mUrl;
+    protected List<String> mBannerUrlList;
     private boolean isScrolling;
-    protected String mBannerCache;
-
-    public HeaderView(Context context, RequestManager loader, String api, String bannerCache) {
+    
+    public HeaderView(Context context, RequestManager loader, List<String> bannerUrlList) {
         super(context);
+        mBannerUrlList = bannerUrlList;
         mImageLoader = loader;
-        this.mUrl = api;
-        this.mBannerCache = bannerCache;
+        
+        System.out.println(mBannerUrlList.size() + "HeaderView");
         init(context);
     }
-
+    
     protected void init(Context context) {
-        mBanners = new ArrayList<>();
-//        List<Banner> banners = CacheManager.readListJson(context, mBannerCache, Banner.class);
-        List<Banner> banners = null;
-        if (banners != null) {
-            mBanners.addAll(banners);
-            if (mHandler == null)
-                mHandler = new Handler();
-            mHandler.postDelayed(this, 5000);
-        }
+
         LayoutInflater.from(context).inflate(getLayoutId(), this, true);
         mViewPager = (ViewPager) findViewById(R.id.vp_banner);
         mIndicator = (CirclePagerIndicator) findViewById(R.id.indicator);
@@ -65,8 +50,8 @@ public abstract class HeaderView extends RelativeLayout implements ViewPager.OnP
         mViewPager.addOnPageChangeListener(this);
         mViewPager.setAdapter(mAdapter);
         mIndicator.bindViewPager(mViewPager);
-        mIndicator.setCount(mBanners.size());
-
+        mIndicator.setCount(mBannerUrlList.size());
+        
         new SmoothScroller(getContext()).bingViewPager(mViewPager);
         mViewPager.setOnTouchListener(new OnTouchListener() {
             @Override
@@ -87,34 +72,10 @@ public abstract class HeaderView extends RelativeLayout implements ViewPager.OnP
                 return false;
             }
         });
-        mCallBack = new TextHttpResponseHandler() {
-           
-    
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                /*try {
-                    ResultBean<PageBean<Banner>> result = AppOperator.createGson().fromJson(responseString,
-                            new TypeToken<ResultBean<PageBean<Banner>>>() {
-                            }.getType());
-                    if (result != null && result.isSuccess()) {
-                        CacheManager.saveToJson(getContext(), mBannerCache, result.getResult().getItems());
-                        setBanners(result.getResult().getItems());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
-//                ResultBean<PageBean<Banner>> result
-//                setBanners(result.getResult().getItems());
-            }
-        };
+        
         requestBanner();
     }
-
+    
     @Override
     public void run() {
         mHandler.postDelayed(this, 5000);
@@ -123,78 +84,84 @@ public abstract class HeaderView extends RelativeLayout implements ViewPager.OnP
         mCurrentItem = mCurrentItem + 1;
         mViewPager.setCurrentItem(mCurrentItem);
     }
-
-    public void requestBanner() {
-        if (mHandler == null)
-            mHandler = new Handler();
-        mHandler.removeCallbacks(this);
     
+    public void requestBanner() {
+        if (mHandler == null) {
+            mHandler = new Handler();
+        }
+        mHandler.removeCallbacks(this);
+        
         // TODO: 2017/2/20 联网获取Banner 
 //        OSChinaApi.getBanner(mUrl, mCallBack);
-    }
 
-    void setBanners(List<Banner> banners) {
-        if (banners != null) {
+//        mImageLoader.load(mBanners.get(0));
+        
+        setStringList(mBannerUrlList);
+        
+    }
+    
+    void setStringList(List<String> banner) {
+        if (banner != null) {
             mHandler.removeCallbacks(this);
-            mBanners.clear();
-            mBanners.addAll(banners);
+            mBannerUrlList.clear();
+            mBannerUrlList.addAll(banner);
             mViewPager.getAdapter().notifyDataSetChanged();
-            mIndicator.setCount(mBanners.size());
+            mIndicator.setCount(mBannerUrlList.size());
             mIndicator.notifyDataSetChanged();
-            if (mCurrentItem == 0 && mBanners.size() != 1) {
-                mCurrentItem = mBanners.size() * 1000;
+            if (mCurrentItem == 0 && mBannerUrlList.size() != 1) {
+                mCurrentItem = mBannerUrlList.size() * 1000;
                 mViewPager.setCurrentItem(mCurrentItem);
             }
-            if (mBanners.size() > 1) {
+            if (mBannerUrlList.size() > 1) {
                 mHandler.postDelayed(this, 5000);
             }
         }
     }
-
+    
     protected abstract int getLayoutId();
-
+    
     protected abstract Object instantiateItem(ViewGroup container, int position);
-
+    
     protected abstract void destroyItem(ViewGroup container, int position, Object object);
-
+    
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         isScrolling = mCurrentItem != position;
     }
-
+    
     @Override
     public void onPageSelected(int position) {
         isScrolling = false;
         mCurrentItem = position;
     }
-
+    
     @Override
     public void onPageScrollStateChanged(int state) {
         isScrolling = state != ViewPager.SCROLL_STATE_IDLE;
     }
-
+    
     private class BannerAdapter extends PagerAdapter {
         @Override
         public int getCount() {
-            return mBanners.size() == 1 ? 1 : Integer.MAX_VALUE;
+            return mBannerUrlList.size() == 1 ? 1 : Integer.MAX_VALUE;
         }
-
+        
         @Override
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
-
+        
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             return HeaderView.this.instantiateItem(container, position);
         }
-
+        
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             HeaderView.this.destroyItem(container, position, object);
         }
     }
-
+    
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -202,7 +169,7 @@ public abstract class HeaderView extends RelativeLayout implements ViewPager.OnP
             mHandler = new Handler();
         mHandler.postDelayed(this, 5000);
     }
-
+    
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();

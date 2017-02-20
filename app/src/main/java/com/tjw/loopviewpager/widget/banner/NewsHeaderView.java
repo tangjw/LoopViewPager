@@ -6,20 +6,19 @@ import android.widget.TextView;
 
 import com.bumptech.glide.RequestManager;
 import com.tjw.loopviewpager.R;
-import com.tjw.loopviewpager.bean.Banner;
 
 import java.util.List;
-
-/**
- * Created by haibin
- * on 2016/10/26.
- */
 
 public class NewsHeaderView extends HeaderView {
     private TextView mTitleTextView;
     
-    public NewsHeaderView(Context context, RequestManager loader, String api, String bannerCache) {
-        super(context, loader, api, bannerCache);
+    private List<String> mStringList;
+    
+    
+    public NewsHeaderView(Context context, RequestManager loader, List<String> banners) {
+        super(context, loader, banners);
+        mStringList = banners;
+        System.out.println(mStringList.size() + "----");
     }
     
     @Override
@@ -36,17 +35,18 @@ public class NewsHeaderView extends HeaderView {
     @Override
     public void onPageSelected(int position) {
         super.onPageSelected(position);
-        if (mBanners.size() != 0) {
-//            mTitleTextView.setText(mBanners.get(position % mBanners.size()).getName());
+    
+        System.out.println(mStringList.size());
+        if (mStringList.size() != 0) {
+//            mTitleTextView.setText(mStringList.get(position % mStringList.size()).getName());
             mTitleTextView.setText("test");
         }
     }
     
-    @Override
-    void setBanners(List<Banner> banners) {
-        super.setBanners(banners);
-        if (banners.size() > 0 && mCurrentItem == 0) {
-//            mTitleTextView.setText(banners.get(0).getName());
+    void setStringList(List<String> stringList) {
+        super.setStringList(stringList);
+        if (stringList.size() > 0 && mCurrentItem == 0) {
+//            mTitleTextView.setText(mStringList.get(0).getName());
             mTitleTextView.setText("test");
         }
     }
@@ -54,10 +54,10 @@ public class NewsHeaderView extends HeaderView {
     @Override
     protected Object instantiateItem(ViewGroup container, int position) {
         ViewNewsBanner view = new ViewNewsBanner(getContext());
-        if (mBanners.size() != 0) {
-            int p = position % mBanners.size();
-            if (p >= 0 && p < mBanners.size()) {
-                view.initData(mImageLoader, mBanners.get(p));
+        if (mStringList.size() != 0) {
+            int p = position % mStringList.size();
+            if (p >= 0 && p < mStringList.size()) {
+                view.initData(mImageLoader, mStringList.get(p));
                 
             }
         }

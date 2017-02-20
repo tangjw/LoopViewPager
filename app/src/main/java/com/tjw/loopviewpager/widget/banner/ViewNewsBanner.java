@@ -8,7 +8,6 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.RequestManager;
 import com.tjw.loopviewpager.R;
-import com.tjw.loopviewpager.bean.Banner;
 
 
 /**
@@ -16,7 +15,7 @@ import com.tjw.loopviewpager.bean.Banner;
  * on 16-5-23.
  */
 public class ViewNewsBanner extends RelativeLayout implements View.OnClickListener {
-    private Banner banner;
+    private String bannerUrl;
     private ImageView iv_banner;
 
     public ViewNewsBanner(Context context) {
@@ -29,15 +28,16 @@ public class ViewNewsBanner extends RelativeLayout implements View.OnClickListen
         iv_banner = (ImageView) findViewById(R.id.iv_banner);
         setOnClickListener(this);
     }
-
-    public void initData(RequestManager manager, Banner banner) {
-        this.banner = banner;
-//        manager.load(banner.getImg()).into(iv_banner);
+    
+    public void initData(RequestManager manager, String banner) {
+        this.bannerUrl = banner;
+        manager.load(banner).into(iv_banner);
+        
     }
 
     @Override
     public void onClick(View v) {
-        if (banner != null) {
+        if (bannerUrl != null) {
 //            int type = banner.getType();
 //            long id = banner.getId();
 //            UIHelper.showDetail(getContext(), type, id, banner.getHref());
