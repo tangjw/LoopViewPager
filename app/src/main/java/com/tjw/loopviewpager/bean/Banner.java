@@ -1,29 +1,72 @@
 package com.tjw.loopviewpager.bean;
 
-import java.util.List;
-
 /**
  * Created by Android on 2017/2/20.
  */
 
 public class Banner {
     
-    private int code;
-    private List<String> data;
+    private int id;
+    private int meetingId;
+    private String name;
+    private String img;
+    private int bannerType;
+    private String url;
+    private String descr;
     
-    public int getCode() {
-        return code;
+    public int getId() {
+        return id;
     }
     
-    public void setCode(int code) {
-        this.code = code;
+    public void setId(int id) {
+        this.id = id;
     }
     
-    public List<String> getData() {
-        return data;
+    public int getMeetingId() {
+        return meetingId;
     }
     
-    public void setData(List<String> data) {
-        this.data = data;
+    public void setMeetingId(int meetingId) {
+        this.meetingId = meetingId;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getImg() {
+        return img;
+    }
+    
+    public void setImg(String img) {
+        this.img = img;
+    }
+    
+    public int getBannerType() {
+        return bannerType;
+    }
+    
+    public void setBannerType(int bannerType) {
+        this.bannerType = bannerType;
+    }
+    
+    public String getUrl() {
+        return url;
+    }
+    
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+    public String getDescr() {
+        return descr;
+    }
+    
+    public void setDescr(String descr) {
+        this.descr = descr;
     }
 }

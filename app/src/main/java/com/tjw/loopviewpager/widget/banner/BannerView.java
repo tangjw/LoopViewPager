@@ -6,11 +6,6 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-/**
- * Created by haibin
- * on 2016/11/29.
- */
-
 public class BannerView extends ViewPager implements Runnable {
     private Handler mHandler;
     private int mDelay;

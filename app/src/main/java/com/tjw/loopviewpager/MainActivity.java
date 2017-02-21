@@ -4,41 +4,36 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 
-import com.bumptech.glide.Glide;
-import com.tjw.loopviewpager.widget.banner.NewsHeaderView;
+import com.tjw.loopviewpager.bean.BannerListRes;
+import com.tjw.loopviewpager.net.BaseSubscriber;
+import com.tjw.loopviewpager.net.HttpMethods;
+import com.tjw.loopviewpager.widget.banner.SimpleHeaderView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     
     private ListView mListView;
+    private SimpleHeaderView mHeaderView;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//        mListView = (ListView) findViewById(R.id.lv_list);
-    
-    
-        ArrayList<String> banners = new ArrayList<>();
-    
-        banners.add("http://i.imgur.com/FI49ftb.jpg");
-        banners.add("http://i.imgur.com/55w5Km7.jpg");
-        banners.add("http://i.imgur.com/F8n3Ic6.jpg");
-        banners.add("http://i.imgur.com/Ig9oHCM.jpg");
-        banners.add("http://i.imgur.com/aFhEEby.jpg");
-        banners.add("http://i.imgur.com/P5ZRSvT.jpg");
-        banners.add("http://i.imgur.com/jbemFzr.jpg");
-        banners.add("http://i.imgur.com/OKvWoTh.jpg");
-    
-    
-        NewsHeaderView headerView = new NewsHeaderView(this, Glide.with(this), banners);
-    
-        setContentView(headerView);
-//        mListView.addHeaderView(headerView);
-//        
-//        mListView.setAdapter(new MainListAdapter(banners));
+        setContentView(R.layout.activity_main);
+        mListView = (ListView) findViewById(R.id.lv_list);
         
+        mHeaderView = new SimpleHeaderView(this);
         
+        mListView.addHeaderView(mHeaderView);
+        
+        mListView.setAdapter(new MainListAdapter(new ArrayList<String>()));
+        
+        HttpMethods.getInstance()
+                .getMeetingBanners(0, new BaseSubscriber<BannerListRes>(this) {
+                    @Override
+                    public void onNext(BannerListRes bannerListRes) {
+                        mHeaderView.loadBanner(bannerListRes.getData());
+                    }
+                });
     }
 }

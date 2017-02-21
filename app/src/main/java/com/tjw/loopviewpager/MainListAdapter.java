@@ -25,7 +25,8 @@ public class MainListAdapter extends BaseAdapter {
     
     @Override
     public int getCount() {
-        return mBannerList.size();
+//        return mBannerList.size();
+        return 30;
     }
     
     @Override
